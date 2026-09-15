@@ -1,0 +1,374 @@
+:root {
+    --primary: #95a5a6; /* Changed from #50fa7b to #95a5a6 */
+    --secondary: #7f8c8d;
+    --dark: #1f1f1f;
+    --light: #f8f8f2;
+    --success: #95a5a6; /* Changed from #50fa7b to #95a5a6 */
+    --error: #ff5555;
+    --warning: #ffb86c; /* Adjusted for a warm yellow, if not used for tilde */
+    --terminal-user-color: #95a5a6; /* Changed from #50fa7b to #95a5a6 */
+    --terminal-tilde-color: #bd93f9; /* Explicit color for ~ (purple) */
+    --terminal-dollar-color: #95a5a6; /* Changed from #50fa7b to #95a5a6 */
+    --terminal-title-text-color: #f8f8f2; /* Color for atharv@portfolio:~ in header */
+}
+
+* {
+    margin: 0;
+    padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+    font-family: 'Fira Code', monospace;
+    background-color: var(--dark);
+    color: var(--light);
+  line-height: 1.6;
+    overflow-x: hidden;
+    padding: 20px;
+}
+ 
+.terminal {
+    max-width: 1000px;
+    margin: 20px auto;
+    background-color: #171717;
+    border-radius: 8px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+  overflow: hidden;
+}
+
+.terminal-header {
+    background-color: #2a2a2a;
+    padding: 10px 15px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-top-left-radius: 8px;
+    border-top-right-radius: 8px;
+}
+
+.terminal-title-text {
+    color: var(--terminal-title-text-color); 
+    font-size: 0.85rem; /* Increased font size for better visibility */ 
+    font-family: 'Fira Code', monospace;
+    margin-left: auto; 
+}
+
+.terminal-title {
+    display: flex;
+    align-items: center;
+}
+
+.terminal-buttons {
+    display: flex;
+    gap: 8px;
+}
+
+.terminal-button {
+    width: 12px;
+    height: 12px;
+  border-radius: 50%;
+}
+
+.terminal-button.close {
+    background-color: #ff5f56;
+}
+
+.terminal-button.minimize {
+    background-color: #ffbd2e;
+}
+
+.terminal-button.maximize {
+    background-color: #27c93f;
+}
+
+.terminal-body {
+    padding: 20px;
+    height: calc(100vh - 120px);
+    min-height: 500px;
+    overflow-y: auto;
+  position: relative;
+}
+
+.terminal-body::-webkit-scrollbar {
+    width: 8px;
+}
+
+.terminal-body::-webkit-scrollbar-track {
+    background: #141414;
+}
+
+.terminal-body::-webkit-scrollbar-thumb {
+    background: #444;
+    border-radius: 4px;
+}
+
+.terminal-body::-webkit-scrollbar-thumb:hover {
+    background: #777;
+}
+
+.prompt {
+    display: flex;
+    margin-bottom: 10px;
+}
+
+.prompt-sign {
+    color: var(--primary);
+    margin-right: 10px;
+    font-weight: bold;
+}
+
+.prompt-user {
+    color: var(--terminal-user-color);
+    margin-right: 5px;
+}
+
+.prompt-location {
+    color: var(--light);
+    margin-right: 10px;
+}
+
+.prompt-input {
+    color: var(--primary);
+}
+
+.prompt-dollar-input {
+    color: var(--primary);
+    margin-right: 5px;
+}
+
+.response {
+    padding-left: 25px;
+    margin-bottom: 20px;
+    color: var(--light);
+}
+
+.ascii-art {
+    color: var(--primary);
+    font-size: 12px;
+    line-height: 1.2;
+    margin-bottom: 20px;
+    white-space: pre;
+}
+
+.section-title {
+    color: var(--primary);
+    font-weight: bold;
+    margin-bottom: 10px;
+    border-bottom: 1px solid var(--primary);
+    padding-bottom: 5px;
+  display: inline-block;
+}
+
+.command {
+    color: var(--success);
+    font-weight: bold;
+}
+
+.error {
+    color: var(--error);
+}
+
+.warning {
+    color: var(--warning);
+}
+
+.highlight {
+    color: var(--primary);
+    font-weight: bold;
+}
+
+.blink {
+    animation: blink 1s infinite;
+}
+
+@keyframes blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0; }
+}
+
+.typing {
+    overflow: hidden;
+    white-space: nowrap;
+    animation: typing 3s steps(40, end);
+}
+
+@keyframes typing {
+    from { width: 0 }
+    to { width: 100% }
+}
+
+.terminal-input-area {
+    display: flex;
+    margin-top: 20px;
+}
+
+#terminal-input {
+    background: transparent;
+    border: none;
+    color: var(--light);
+    font-family: 'Fira Code', monospace;
+    font-size: 16px;
+    flex-grow: 1;
+    outline: none;
+    caret-color: transparent; /* Hide the native caret */
+}
+
+#input-container {
+    position: relative;
+    display: flex;
+    flex-grow: 1;
+    align-items: center; /* Vertically align items in the container */
+}
+
+#custom-blinking-cursor {
+    position: absolute;
+    top: 50%; /* Center vertically */
+    transform: translateY(-50%); /* Adjust for perfect vertical centering */
+    left: 0; /* Will be set dynamically by JS */
+    display: inline; /* Ensure it's visible by default if needed, JS will control visibility */
+}
+
+.project-card {
+    border: 1px solid var(--primary);
+    border-radius: 4px;
+    padding: 15px;
+    margin-bottom: 15px;
+    background-color: rgba(149, 165, 166, 0.1);
+}
+
+.project-title {
+    color: var(--primary);
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
+.project-description {
+    margin-bottom: 10px;
+}
+
+.project-link {
+    color: var(--warning);
+  text-decoration: none;
+}
+
+.project-link:hover {
+  text-decoration: underline;
+}
+
+.skill-category {
+    margin-bottom: 15px;
+}
+
+.skill-name {
+    display: inline-block;
+    margin-right: 10px;
+    margin-bottom: 5px;
+    background-color: rgba(149, 165, 166, 0.2);
+    padding: 3px 8px;
+    border-radius: 3px;
+}
+
+.contact-item {
+    margin-bottom: 10px;
+}
+
+.contact-label {
+    color: var(--primary);
+    margin-right: 10px;
+}
+
+.github-activity {
+    margin-top: 15px;
+}
+
+.github-repo {
+    margin-bottom: 10px;
+    padding: 10px;
+    background-color: rgba(149, 165, 166, 0.1);
+    border-radius: 4px;
+}
+
+.github-repo-name {
+    color: var(--primary);
+    font-weight: bold;
+}
+
+.github-repo-description {
+    font-size: 14px;
+    margin-top: 5px;
+}
+
+.github-repo-stats {
+    display: flex;
+    gap: 15px;
+    margin-top: 5px;
+    font-size: 14px;
+}
+
+.github-repo-stat {
+    display: flex;
+    align-items: center;
+}
+
+.github-repo-stat i {
+    margin-right: 5px;
+    color: var(--warning);
+}
+
+.help-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.help-item {
+    background-color: rgba(149, 165, 166, 0.1);
+    padding: 10px;
+    border-radius: 4px;
+}
+
+.help-command {
+    color: var(--success);
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+.help-description {
+    font-size: 14px;
+}
+
+.loading {
+    display: inline-block;
+    position: relative;
+}
+
+.loading:after {
+    content: '.';
+    animation: dots 1.5s steps(5, end) infinite;
+}
+
+@keyframes dots {
+    0%, 20% { content: '.'; }
+    40% { content: '..'; }
+    60% { content: '...'; }
+    80%, 100% { content: ''; }
+}
+
+@media (max-width: 768px) {
+    .terminal {
+        margin: 10px;
+    }
+    
+    .terminal-body {
+        height: calc(100vh - 100px);
+    }
+    
+    .ascii-art {
+        font-size: 8px;
+    }
+    
+    .help-grid {
+        grid-template-columns: 1fr;
+    }
+}
