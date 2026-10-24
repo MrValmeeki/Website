@@ -20,7 +20,7 @@ export const projects: readonly Project[] = [
   {
     number: "01",
     title: "AshVale",
-    label: "2D C++ Game Engine & Pixel RPG",
+    label: "A 2D RPG & C++ game engine",
     tagline: "Deterministic game loop, custom physics, and frame-accurate sprite rendering.",
     description:
       "Custom 2D action RPG engine engineered from scratch in C++. Implements deterministic tick updates, AABB collision detection, sprite sheet animations, and modular finite state machines.",
@@ -39,7 +39,7 @@ export const projects: readonly Project[] = [
   {
     number: "02",
     title: "Cosmic Canvas",
-    label: "Interactive N-Body Gravity Simulator",
+    label: "A Python gravity simulator",
     tagline: "Real-time orbital mechanics, planetary collisions, and black hole evolution.",
     description:
       "Interactive gravitational sandbox solving multi-body orbital mechanics via numerical integration. Simulates gravitational trajectories, mass mergers, and chaotic binary star orbits.",
@@ -58,7 +58,7 @@ export const projects: readonly Project[] = [
   {
     number: "03",
     title: "WakeMeThere",
-    label: "Smart Travel Alarm & Geofencing Assistant",
+    label: "An Android travel alarm",
     tagline: "Location-aware travel alarm triggering precision alerts near transit stops.",
     description:
       "Android travel assistant built with Kotlin and Jetpack Compose. Tracks real-time GPS trajectories in background services and fires audio alerts upon crossing destination geofence radii.",
@@ -77,7 +77,7 @@ export const projects: readonly Project[] = [
   {
     number: "04",
     title: "Mini-Blog",
-    label: "Fast Social Publishing Engine",
+    label: "A simple blogging app",
     tagline: "Distraction-free publishing with authentication and real-time cloud sync.",
     description:
       "Minimalist writing platform featuring markdown authoring, session authentication, and instantaneous document persistence powered by Firebase Firestore.",

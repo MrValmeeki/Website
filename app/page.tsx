@@ -1,557 +1,81 @@
 "use client";
-
-import { motion, useReducedMotion, useScroll, useSpring } from "framer-motion";
-import { ArrowDown, ArrowUpRight, Bot, Cpu, Github, Layers, Linkedin, Mail, Sparkles, Terminal } from "lucide-react";
-import { useEffect, useState } from "react";
-import { ContactForm } from "@/components/contact-form";
-import { CustomCursor } from "@/components/custom-cursor";
-import { Hero } from "@/components/hero";
-import { Navbar } from "@/components/navbar";
-import { ProjectCard } from "@/components/project-card";
-import { SkillsMatrix } from "@/components/skills-matrix";
-import { TerminalDrawer } from "@/components/terminal-drawer";
-import { Timeline } from "@/components/timeline";
-import { focusAreas, profile, quickStats } from "@/data/profile";
+import { useEffect, useRef, useState } from "react";
+import { motion, MotionConfig, useReducedMotion, useScroll, useSpring } from "framer-motion";
+import { ArrowDown, ArrowUpRight, Github, Pause, Play, RotateCcw } from "lucide-react";
+import { PlayShape } from "@/components/play-shape";
+import { profile } from "@/data/profile";
 import { projects } from "@/data/projects";
-import { sound } from "@/lib/sound";
-
+function Playground({ still }: {
+    still: boolean;
+}) {
+    const bounds = useRef<HTMLDivElement>(null);
+    const [reset, setReset] = useState(0);
+    return <div className="playground" ref={bounds}>
+  <div className="playground-label"><span>A LITTLE DISTRACTION</span><span>YOU CAN DRAG THESE AROUND ↙</span></div>
+  <span className="sr-only" id="playground-help">Drag a shape, or focus it and use arrow keys to move. Hold Shift for larger steps. Press Enter to reset its position.</span><div className="crosshair crosshair-one"/><div className="crosshair crosshair-two"/>
+  <PlayShape key={`orb-${reset}`} name="orbit" className="toy orb" bounds={bounds} still={still}><div className="orb-wire"/><div className="orb-wire two"/><div className="orb-equator"/><span>GO ON,<br />GIVE IT A NUDGE.</span></PlayShape>
+  <PlayShape key={`tile-${reset}`} name="code card" className="toy code-tile" bounds={bounds} still={still}><span>hello_world.cpp</span><strong>{"{ }"}</strong><small>STILL FIGURING IT OUT</small></PlayShape>
+  <PlayShape key={`star-${reset}`} name="star" className="toy star-toy" bounds={bounds} still={still}><span>✳</span></PlayShape>
+  <div className="playground-bottom"><span>MOVE THINGS AROUND. IT’S FINE.</span><button onClick={() => setReset(v => v + 1)} aria-label="Reset playground shapes"><RotateCcw size={14}/> reset</button></div>
+ </div>;
+}
+function Artwork({ kind }: {
+    kind: string;
+}) {
+    if (kind === "pixel")
+        return <div className="art art-game" aria-label="Animated illustration of a pixel game"><span className="art-label">01 / ASHVALE</span><div className="game-grid"/><div className="game-window"><div className="window-bar"><span>ASHVALE.EXE</span><span>— □ ×</span></div><div className="game-world"><div className="game-moon"/><div className="game-hill one"/><div className="game-hill two"/><div className="platform p1"/><div className="platform p2"/><div className="little-guy"/><span className="game-hud">HP ♥ ♥ ♥<br />LVL 01</span></div></div><span className="art-note">Built in C++, including the engine.</span></div>;
+    if (kind === "orbit")
+        return <div className="art art-space" aria-label="Animated illustration of orbiting planets"><span className="art-label">02 / COSMIC CANVAS</span><div className="space-system"><div className="orbit-ring r1"><i /></div><div className="orbit-ring r2"><i /></div><div className="orbit-ring r3"><i /></div><div className="space-core">✳</div></div><span className="space-equation">F = G(m₁m₂)/r²</span><span className="art-note">Planets, orbits, and the occasional collision.</span></div>;
+    return <div className="art art-map" aria-label="Animated illustration of a destination alarm"><span className="art-label">03 / WAKEMETHERE</span><div className="map-lines"/><svg className="map-route" viewBox="0 0 600 420" aria-hidden="true"><path className="route-base" d="M80 360V220Q80 195 110 195H360Q390 195 390 165V55"/><path className="route-dash" d="M80 360V220Q80 195 110 195H360Q390 195 390 165V55"/><circle cx="390" cy="55" r="17" fill="#df542f"/></svg><div className="phone"><div className="phone-speaker"/><span className="phone-time">Almost there.</span><div className="phone-icon">↗</div><strong>Your stop<br />is coming up.</strong><small>WakeMeThere</small><div className="phone-progress"><i /></div></div><span className="art-note">An alarm for when you’re close to your stop.</span></div>;
+}
 export default function Home() {
-  const [isTerminalOpen, setIsTerminalOpen] = useState(false);
-  const [activeProjectFilter, setActiveProjectFilter] = useState<string>("All");
-  const reduceMotion = useReducedMotion();
-
-  const { scrollYProgress } = useScroll();
-  const scaleX = useSpring(scrollYProgress, {
-    stiffness: 120,
-    damping: 24,
-    restDelta: 0.001,
-  });
-
-  useEffect(() => {
-    try {
-      localStorage.removeItem("atharv-portfolio-theme");
-    } catch {}
-    document.documentElement.removeAttribute("data-theme");
-  }, []);
-
-  const filteredProjects =
-    activeProjectFilter === "All"
-      ? projects
-      : projects.filter((p) => p.category === activeProjectFilter);
-
-  const filterCategories = ["All", "Robotics & AI", "Game Dev & Graphics", "Systems & Apps"];
-
-  return (
-    <>
-      <CustomCursor />
-
-      {/* Hardware Telemetry Top Scroll Indicator */}
-      {!reduceMotion && (
-        <motion.div
-          className="fixed top-0 left-0 right-0 h-[2px] bg-cyan-400 origin-left z-50 pointer-events-none shadow-[0_0_10px_rgba(34,211,238,0.8)]"
-          style={{ scaleX }}
-          aria-hidden="true"
-        />
-      )}
-
-      {/* Navigation */}
-      <Navbar onOpenTerminal={() => setIsTerminalOpen(true)} />
-
-      {/* Embedded CLI Terminal Drawer (Homage to atharvbabu.netlify.app) */}
-      <TerminalDrawer
-        isOpen={isTerminalOpen}
-        onClose={() => setIsTerminalOpen(false)}
-      />
-
-      <main id="main-content">
-        {/* Section 00: Hero (Autonomous Mobile Robotics Simulation Viewport + Hardware Spec) */}
-        <Hero onOpenTerminal={() => setIsTerminalOpen(true)} />
-
-        {/* Section 01: System Specifications & Architecture (About Bento) */}
-        <section id="about" className="section border-t border-white/10 relative">
-          <div className="page-width">
-            <motion.div
-              initial={reduceMotion ? false : { opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, amount: 0.2 }}
-              transition={{ duration: 0.5 }}
-            >
-              <div className="section-kicker">
-                <span className="kicker-index">01</span>
-                <span>SYSTEM SPECIFICATION // CORE ARCHITECTURE</span>
-              </div>
-
-              <h2 className="section-title">
-                Engineering with curiosity, <br className="hidden sm:inline" />
-                <span className="text-cyan-400">
-                  rigor, and purpose.
-                </span>
-              </h2>
-
-              <p className="section-desc mb-8">
-                Bridging low-level systems programming with autonomous machine intelligence.
-              </p>
-            </motion.div>
-
-            {/* Industrial Bento Diagnostics Grid */}
-            <motion.div
-              initial={reduceMotion ? false : { opacity: 0, y: 24 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, amount: 0.1 }}
-              transition={{ duration: 0.5 }}
-              className="grid grid-cols-1 lg:grid-cols-12 gap-5 corner-frame"
-            >
-              {/* Main Architectural Bio Card (7 cols) */}
-              <motion.div
-                whileHover={reduceMotion ? undefined : { y: -2 }}
-                transition={{ duration: 0.2 }}
-                className="lg:col-span-7 bento-card glow-cyan flex flex-col justify-between"
-              >
-                <div>
-                  <div className="flex items-center justify-between mb-4 pb-2 border-b border-white/10 text-xs font-mono">
-                    <span className="text-cyan-400 font-bold uppercase tracking-wider">
-                      SPEC // PHILOSOPHY &amp; HARDWARE CONTEXT
-                    </span>
-                    <span className="text-slate-500">AUTONOMOUS ROBOTICS</span>
-                  </div>
-
-                  <p className="text-base sm:text-lg text-slate-200 leading-snug font-medium mb-4">
-                    {profile.about[0]}
-                  </p>
-
-                  <div className="space-y-2.5 text-xs sm:text-sm text-slate-400">
-                    <div className="flex items-start gap-2.5">
-                      <span className="text-cyan-400 font-mono mt-0.5">›</span>
-                      <p>{profile.about[1]}</p>
-                    </div>
-                    <div className="flex items-start gap-2.5">
-                      <span className="text-cyan-400 font-mono mt-0.5">›</span>
-                      <p>{profile.about[2]}</p>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="pt-5 mt-6 border-t border-white/10 flex flex-wrap items-center justify-between gap-4 text-xs font-mono text-slate-400">
-                  <div className="flex items-center gap-2">
-                    <span className="w-2 h-2 bg-cyan-400 inline-block animate-pulse" />
-                    <span>Robotics &amp; AI Engineering Student</span>
-                  </div>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      sound.playBlip();
-                      setIsTerminalOpen(true);
-                    }}
-                    className="text-cyan-400 hover:underline flex items-center gap-1 font-bold active:scale-95 transition-transform"
-                  >
-                    <Terminal size={13} />
-                    <span>EXECUTE &apos;whoami&apos; IN CLI ↗</span>
-                  </button>
-                </div>
-              </motion.div>
-
-              {/* Hardware Diagnostic Metrics (5 cols) */}
-              <div className="lg:col-span-5 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 gap-3.5">
-                {quickStats.map((stat, idx) => (
-                  <motion.div
-                    key={stat.label}
-                    initial={reduceMotion ? false : { opacity: 0, x: 12 }}
-                    whileInView={{ opacity: 1, x: 0 }}
-                    viewport={{ once: true }}
-                    transition={{ duration: 0.35, delay: reduceMotion ? 0 : idx * 0.06 }}
-                    whileHover={reduceMotion ? undefined : { x: 4 }}
-                    className="p-4 bg-slate-900 border border-white/10 hover:border-cyan-400/50 hover:bg-slate-900/90 transition-all font-mono group cursor-default"
-                  >
-                    <div className="flex items-center justify-between text-[0.65rem] text-slate-500 uppercase tracking-wider mb-1">
-                      <span>METRIC // 0{idx + 1}</span>
-                      <span className="text-emerald-400 group-hover:drop-shadow-[0_0_6px_rgba(52,211,153,0.8)] transition-all">
-                        NOMINAL
-                      </span>
-                    </div>
-                    <span className="text-xs text-slate-400 block mb-0.5">{stat.label}</span>
-                    <span className="text-base sm:text-lg font-bold text-white tracking-tight block">
-                      {stat.value}
-                    </span>
-                  </motion.div>
-                ))}
-              </div>
-            </motion.div>
-
-            {/* Subsystem Disciplines Grid */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mt-5">
-              {focusAreas.map((area, idx) => {
-                const borderHover =
-                  area.color === "cyan"
-                    ? "glow-cyan"
-                    : area.color === "violet"
-                    ? "glow-violet"
-                    : area.color === "amber"
-                    ? "glow-amber"
-                    : "glow-emerald";
-
-                const icon =
-                  area.color === "cyan" ? (
-                    <Bot size={17} className="text-cyan-400" />
-                  ) : area.color === "violet" ? (
-                    <Sparkles size={17} className="text-violet-400" />
-                  ) : area.color === "amber" ? (
-                    <Layers size={17} className="text-amber-400" />
-                  ) : (
-                    <Cpu size={17} className="text-emerald-400" />
-                  );
-
-                return (
-                  <motion.div
-                    key={area.title}
-                    initial={reduceMotion ? false : { opacity: 0, y: 16 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true, amount: 0.2 }}
-                    transition={{ duration: 0.4, delay: reduceMotion ? 0 : idx * 0.07 }}
-                    whileHover={reduceMotion ? undefined : { y: -4 }}
-                    className={`bento-card ${borderHover} p-5 flex flex-col justify-between group cursor-default`}
-                  >
-                    <div>
-                      <div className="flex items-center justify-between mb-3 pb-2 border-b border-white/10 font-mono">
-                        <span className="text-xs text-slate-500">{area.index}</span>
-                        <div className="transition-transform duration-200 group-hover:scale-110 group-hover:rotate-6">
-                          {icon}
-                        </div>
-                      </div>
-                      <span className="text-[0.68rem] font-mono text-slate-400 uppercase tracking-wider block mb-1">
-                        {area.tag}
-                      </span>
-                      <h3 className="text-base font-bold text-white mb-2 tracking-tight group-hover:text-cyan-300 transition-colors">
-                        {area.title}
-                      </h3>
-                      <p className="text-xs text-slate-400 leading-relaxed font-sans">{area.copy}</p>
-                    </div>
-                  </motion.div>
-                );
-              })}
-            </div>
-          </div>
-        </section>
-
-        {/* Section 02: Engineering Case Blueprints (Projects) */}
-        <section id="projects" className="section border-t border-white/10 relative">
-          <div className="page-width">
-            <motion.div
-              initial={reduceMotion ? false : { opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, amount: 0.2 }}
-              transition={{ duration: 0.5 }}
-              className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-10"
-            >
-              <div>
-                <div className="section-kicker">
-                  <span className="kicker-index">02</span>
-                  <span>ENGINEERING CASE BLUEPRINTS // RELEASES</span>
-                </div>
-                <h2 className="section-title">
-                  Things engineered <br className="hidden sm:inline" />
-                  <span className="text-amber-400">
-                    to be explored.
-                  </span>
-                </h2>
-                <p className="section-desc">
-                  Featured builds across autonomous simulation, graphics engines, and mobile systems.
-                </p>
-              </div>
-
-              {/* Subsystem Case Filters with Smooth Gliding Indicator */}
-              <div className="flex flex-wrap items-center gap-1.5 p-1 bg-slate-900 border border-white/10 self-start md:self-auto text-xs font-mono">
-                {filterCategories.map((cat) => {
-                  const isSelected = activeProjectFilter === cat;
-                  return (
-                    <button
-                      key={cat}
-                      type="button"
-                      onClick={() => {
-                        sound.playClick();
-                        setActiveProjectFilter(cat);
-                      }}
-                      className={`relative px-3 py-1.5 transition-colors ${
-                        isSelected
-                          ? "text-white font-bold"
-                          : "text-slate-400 hover:text-white"
-                      }`}
-                    >
-                      {isSelected && (
-                        <motion.span
-                          layoutId="activeProjectFilter"
-                          className="absolute inset-0 bg-slate-800 border border-white/20 -z-0"
-                          transition={{ type: "spring", stiffness: 400, damping: 30 }}
-                        />
-                      )}
-                      <span className="relative z-10">{cat}</span>
-                    </button>
-                  );
-                })}
-              </div>
-            </motion.div>
-
-            {/* Engineering Case Schematics List */}
-            <div className="space-y-8">
-              {filteredProjects.map((project, index) => (
-                <ProjectCard key={project.title} project={project} index={index} />
-              ))}
-            </div>
-
-            {/* Bottom GitHub Repository Command Strip */}
-            <motion.div
-              initial={reduceMotion ? false : { opacity: 0, y: 16 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.4 }}
-              whileHover={reduceMotion ? undefined : { y: -2 }}
-              className="mt-12 p-5 sm:p-6 bg-slate-900 border border-white/15 flex flex-col sm:flex-row items-center justify-between gap-4 text-center sm:text-left corner-frame"
-            >
-              <div className="font-mono">
-                <span className="text-cyan-400 text-xs font-bold block mb-1 uppercase tracking-wider">
-                  REPOSITORY INDEX // GITHUB ARCHIVE
-                </span>
-                <h3 className="text-base font-bold text-white">Looking for experimental branches, tests &amp; commits?</h3>
-                <p className="text-xs text-slate-400 mt-0.5">
-                  Commit history, raw sources, and architecture documentation.
-                </p>
-              </div>
-
-              <motion.a
-                whileHover={reduceMotion ? undefined : { scale: 1.02 }}
-                whileTap={reduceMotion ? undefined : { scale: 0.98 }}
-                href={profile.github}
-                target="_blank"
-                rel="noreferrer"
-                onClick={() => sound.playClick()}
-                className="btn btn-secondary font-mono text-xs group"
-              >
-                <Github size={14} />
-                <span>github.com/{profile.githubUsername}</span>
-                <ArrowUpRight size={14} className="group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
-              </motion.a>
-            </motion.div>
-          </div>
-        </section>
-
-        {/* Section 03: Subsystem Diagnostics Matrix (Skills) */}
-        <section id="skills" className="section border-t border-white/10 relative">
-          <div className="page-width">
-            <motion.div
-              initial={reduceMotion ? false : { opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, amount: 0.2 }}
-              transition={{ duration: 0.5 }}
-            >
-              <div className="section-kicker">
-                <span className="kicker-index">03</span>
-                <span>SUBSYSTEM DIAGNOSTICS MATRIX</span>
-              </div>
-
-              <h2 className="section-title">
-                A rigorous, expanding <br className="hidden sm:inline" />
-                <span className="text-emerald-400">
-                  engineering toolkit.
-                </span>
-              </h2>
-
-              <p className="section-desc mb-8">
-                Core technologies, low-level languages, and tools across my engineering stack.
-              </p>
-            </motion.div>
-
-            <SkillsMatrix />
-          </div>
-        </section>
-
-        {/* Section 04: Architecture Changelog & R&D Labs (Journey) */}
-        <section id="journey" className="section border-t border-white/10 relative">
-          <div className="page-width">
-            <motion.div
-              initial={reduceMotion ? false : { opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, amount: 0.2 }}
-              transition={{ duration: 0.5 }}
-            >
-              <div className="section-kicker">
-                <span className="kicker-index">04</span>
-                <span>SYSTEM CHANGELOG &amp; ACTIVE R&amp;D</span>
-              </div>
-
-              <h2 className="section-title">
-                Education, systems engineering, <br className="hidden sm:inline" />
-                <span className="text-violet-400">
-                  and active investigations.
-                </span>
-              </h2>
-
-              <p className="section-desc mb-8">
-                Academic milestones, independent systems software, and active research directions.
-              </p>
-            </motion.div>
-
-            <Timeline />
-          </div>
-        </section>
-
-        {/* Section 05: Technical Dispatch & Direct Channels (Contact) */}
-        <section id="contact" className="section border-t border-white/10 relative">
-          <div className="page-width">
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-              {/* Left Column: CTA Pitch & Social Details */}
-              <motion.div
-                initial={reduceMotion ? false : { opacity: 0, x: -16 }}
-                whileInView={{ opacity: 1, x: 0 }}
-                viewport={{ once: true, amount: 0.2 }}
-                transition={{ duration: 0.5 }}
-                className="lg:col-span-5 space-y-6"
-              >
-                <div>
-                  <div className="section-kicker">
-                    <span className="kicker-index">05</span>
-                    <span>COMMUNICATION DISPATCH</span>
-                  </div>
-
-                  <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white tracking-tight leading-tight mb-4 font-display">
-                    Let’s build something <br />
-                    <span className="text-cyan-400">
-                      extraordinary.
-                    </span>
-                  </h2>
-
-                  <p className="text-sm text-slate-400 leading-relaxed font-sans">
-                    Open for technical discussions, robotics collaboration, or engineering opportunities. Drop a message below.
-                  </p>
-                </div>
-
-                {/* Direct Contact Cards (Solid, Clean) */}
-                <div className="space-y-3 font-mono text-xs">
-                  <motion.a
-                    whileHover={reduceMotion ? undefined : { x: 4 }}
-                    whileTap={reduceMotion ? undefined : { scale: 0.98 }}
-                    transition={{ duration: 0.15 }}
-                    href={"mailto:" + profile.email}
-                    onClick={() => sound.playClick()}
-                    className="p-4 bg-slate-900 border border-white/10 hover:border-cyan-400 flex items-center justify-between transition-colors group"
-                  >
-                    <div className="flex items-center gap-3">
-                      <Mail size={15} className="text-cyan-400 group-hover:scale-110 transition-transform" />
-                      <div>
-                        <span className="text-[0.62rem] text-slate-500 block uppercase">DIRECT INBOX</span>
-                        <span className="text-white group-hover:text-cyan-300 font-bold">{profile.email}</span>
-                      </div>
-                    </div>
-                    <ArrowUpRight size={14} className="text-slate-500 group-hover:text-white group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all" />
-                  </motion.a>
-
-                  <motion.a
-                    whileHover={reduceMotion ? undefined : { x: 4 }}
-                    whileTap={reduceMotion ? undefined : { scale: 0.98 }}
-                    transition={{ duration: 0.15 }}
-                    href={profile.github}
-                    target="_blank"
-                    rel="noreferrer"
-                    onClick={() => sound.playClick()}
-                    className="p-4 bg-slate-900 border border-white/10 hover:border-violet-400 flex items-center justify-between transition-colors group"
-                  >
-                    <div className="flex items-center gap-3">
-                      <Github size={15} className="text-violet-400 group-hover:scale-110 transition-transform" />
-                      <div>
-                        <span className="text-[0.62rem] text-slate-500 block uppercase">PUBLIC REPOSITORIES</span>
-                        <span className="text-white group-hover:text-violet-300 font-bold">github.com/{profile.githubUsername}</span>
-                      </div>
-                    </div>
-                    <ArrowUpRight size={14} className="text-slate-500 group-hover:text-white group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all" />
-                  </motion.a>
-
-                  <motion.a
-                    whileHover={reduceMotion ? undefined : { x: 4 }}
-                    whileTap={reduceMotion ? undefined : { scale: 0.98 }}
-                    transition={{ duration: 0.15 }}
-                    href={profile.linkedin}
-                    target="_blank"
-                    rel="noreferrer"
-                    onClick={() => sound.playClick()}
-                    className="p-4 bg-slate-900 border border-white/10 hover:border-cyan-400 flex items-center justify-between transition-colors group"
-                  >
-                    <div className="flex items-center gap-3">
-                      <Linkedin size={15} className="text-cyan-400 group-hover:scale-110 transition-transform" />
-                      <div>
-                        <span className="text-[0.62rem] text-slate-500 block uppercase">PROFESSIONAL NETWORK</span>
-                        <span className="text-white group-hover:text-cyan-300 font-bold">linkedin.com/in/{profile.linkedinUsername}</span>
-                      </div>
-                    </div>
-                    <ArrowUpRight size={14} className="text-slate-500 group-hover:text-white group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all" />
-                  </motion.a>
-
-                  <div className="p-3.5 bg-slate-900/60 border border-white/5 flex items-center justify-between text-slate-400">
-                    <span className="uppercase text-[0.68rem]">ENGINEERING STATUS</span>
-                    <span className="text-emerald-400 font-bold flex items-center gap-1.5">
-                      <span className="w-2 h-2 bg-emerald-400 rounded-full inline-block animate-pulse" />
-                      <span>ONLINE // OPEN TO BUILD</span>
-                    </span>
-                  </div>
-                </div>
-              </motion.div>
-
-              {/* Right Column: Interactive Form */}
-              <motion.div
-                initial={reduceMotion ? false : { opacity: 0, x: 16 }}
-                whileInView={{ opacity: 1, x: 0 }}
-                viewport={{ once: true, amount: 0.2 }}
-                transition={{ duration: 0.5, delay: 0.1 }}
-                className="lg:col-span-7"
-              >
-                <ContactForm />
-              </motion.div>
-            </div>
-          </div>
-        </section>
-      </main>
-
-      {/* Industrial Footer */}
-      <footer className="border-t border-white/10 bg-[#06080d] py-8">
-        <div className="page-width flex flex-col sm:flex-row items-center justify-between gap-4 text-xs font-mono text-slate-500">
-          <div className="flex items-center gap-2.5">
-            <span className="font-bold text-white tracking-wider">ATHARV.OS</span>
-            <span>//</span>
-            <span>ROBOTICS &amp; ARTIFICIAL INTELLIGENCE LAB</span>
-          </div>
-
-          <div>
-            <p>Engineered with curiosity, physics, and low-level code.</p>
-          </div>
-
-          <div className="flex items-center gap-4">
-            <a href={profile.github} target="_blank" rel="noreferrer" className="hover:text-white transition-colors">
-              GitHub
-            </a>
-            <a href={profile.linkedin} target="_blank" rel="noreferrer" className="hover:text-white transition-colors">
-              LinkedIn
-            </a>
-            <a href={"mailto:" + profile.email} className="hover:text-white transition-colors">
-              Email
-            </a>
-            <button
-              type="button"
-              onClick={() => {
-                sound.playBlip();
-                setIsTerminalOpen(true);
-              }}
-              className="text-cyan-400 hover:underline"
-            >
-              CLI [~]
-            </button>
-            <a
-              href="#home"
-              onClick={() => sound.playClick()}
-              className="hover:text-white transition-colors flex items-center gap-1"
-            >
-              <span>TOP</span>
-              <ArrowDown size={11} className="rotate-180" />
-            </a>
-          </div>
-        </div>
-      </footer>
-    </>
-  );
+    const systemReduced = useReducedMotion();
+    const [paused, setPaused] = useState(false);
+    const still = Boolean(systemReduced || paused);
+    const [copied, setCopied] = useState(false);
+    const [motionReady, setMotionReady] = useState(false);
+    const copyTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+    useEffect(() => {
+        try {
+            setPaused(localStorage.getItem("atharv-play-motion") === "paused");
+        }
+        catch { }
+        setMotionReady(true);
+        return () => { if (copyTimer.current)
+            clearTimeout(copyTimer.current); };
+    }, []);
+    useEffect(() => {
+        if (!motionReady)
+            return;
+        try {
+            localStorage.setItem("atharv-play-motion", paused ? "paused" : "auto");
+        }
+        catch { }
+    }, [paused, motionReady]);
+    const { scrollYProgress } = useScroll();
+    const progress = useSpring(scrollYProgress, { stiffness: 100, damping: 30 });
+    useEffect(() => { document.documentElement.dataset.motion = still ? "off" : "on"; }, [still]);
+    async function copyEmail() {
+        try {
+            await navigator.clipboard.writeText(profile.email);
+            setCopied(true);
+            if (copyTimer.current)
+                clearTimeout(copyTimer.current);
+            copyTimer.current = setTimeout(() => setCopied(false), 2200);
+        }
+        catch {
+            window.location.href = `mailto:${profile.email}`;
+        }
+    }
+    const reveal = { initial: still ? false as const : { opacity: 0, y: 45 }, whileInView: { opacity: 1, y: 0 }, viewport: { once: true, amount: 0.12 }, transition: { duration: 0.7 } };
+    return <MotionConfig reducedMotion={still ? "always" : "never"}>
+ <a href="#main" className="skip">Skip to content</a>{!still && <motion.div className="scroll-progress" style={{ scaleX: progress }}/>}
+ <header className="header shell"><a className="logo" href="#" aria-label="Atharv Babu home">ab<span>✳</span></a><span className="header-caption">MY PROJECTS<br />AND A BIT ABOUT ME.</span><nav aria-label="Main navigation"><a href="#work">Projects <sup>03</sup></a><a href="#about">About me</a><a href="#contact">Say hello <ArrowUpRight size={15}/></a></nav><button className="motion-toggle" onClick={() => setPaused(v => !v)} disabled={Boolean(systemReduced)} title={systemReduced ? "Reduced motion follows your device setting" : "Remember motion preference"} aria-label={systemReduced ? "Reduced motion enabled by your device" : paused ? "Enable animations" : "Pause animations"} aria-pressed={still}>{paused ? <Play size={14}/> : <Pause size={14}/>}<span>{systemReduced ? "Reduced" : paused ? "Play" : "Motion"}</span></button></header>
+ <main id="main"><section className="hero shell"><div className="hero-meta"><span><i /> ATHARV BABU / ROBOTICS & AI STUDENT</span><span>GAMES, SIMULATIONS & SOFTWARE</span></div><h1 aria-label="Hi, I’m Atharv. I make things."><span className="title-line"><motion.span initial={still ? false : { y: "110%" }} animate={{ y: 0 }} transition={{ duration: .9, delay: .1 }}>Hi, I’m Atharv.</motion.span></span><span className="title-line"><motion.span className="outline-title" initial={still ? false : { y: "110%" }} animate={{ y: 0 }} transition={{ duration: .9, delay: .25 }}>I make <em>things.</em></motion.span></span></h1><div className="hero-lower"><div className="hero-bio"><span className="scribble">thanks for stopping by ↗</span><p>I’m a Robotics & AI student. I spend a lot of my time writing C++, working on simulations, and figuring out how things work.</p><p className="muted">Here are a few projects I’ve been working on.</p><a href="#work" className="round-link"><span className="round-icon"><ArrowDown size={20}/></span> TAKE A LOOK AT MY PROJECTS</a><a className="hero-contact" href={`mailto:${profile.email}`}>Have a project in mind? <ArrowUpRight size={14}/></a></div><Playground still={still}/></div><div className="hero-end"><span>THE PROJECTS ARE JUST BELOW</span><span>↓</span><span>C++ / PYTHON / KOTLIN</span></div></section>
+ <div className="marquee" aria-hidden="true"><div>{[0, 1, 2, 3].map(n => <span key={n}>GAME ENGINES <i>✳</i> PHYSICS SIMULATIONS <i>✳</i> ROBOTICS <i>✳</i> </span>)}</div></div>
+ <section className="work shell" id="work"><div className="section-meta"><span>01 / PROJECTS</span><span>THE CODE IS ON GITHUB</span></div><div className="section-heading"><h2>A few things<br /><em>I’ve built.</em></h2><p>A game engine, a gravity simulator,<br />and an app for catching your stop.</p></div><div className="project-list">{projects.filter(p => p.featured).map((p, i) => <motion.article key={p.title} {...reveal} className={`project project-${p.kind}`}><a className="project-visual" href={p.href} target="_blank" rel="noreferrer" aria-label={`View ${p.title} on GitHub (opens in a new tab)`}><Artwork kind={p.kind}/><span className="art-disclaimer">Illustrated preview</span><span className="open-project"><ArrowUpRight /></span></a><div className="project-detail"><span className="project-index">0{i + 1} ↗</span><div><span className="eyebrow">{p.label}</span><h3><a href={p.href} target="_blank" rel="noreferrer">{p.title}</a></h3><p>{p.kind === "pixel" ? "AshVale is a 2D RPG built in C++. I wrote the engine too, including the game loop, collision handling, and sprite animations." : p.kind === "orbit" ? "A gravity sandbox built with Python and Pygame. You can set bodies in motion, watch their orbits, and see what happens when they collide." : "An Android app that alerts you when you’re near your destination. It uses GPS and geofencing, so you don’t have to keep checking the map."}</p><div className="tech-list">{p.technologies.slice(0, 3).map(t => <span key={t}>{t}</span>)}</div><a className="source-link" href={p.href} target="_blank" rel="noreferrer">VIEW ON GITHUB <ArrowUpRight size={17}/></a><details className="build-notes"><summary>Build notes <span aria-hidden="true">+</span></summary><dl>{p.stats.map(stat => <div key={stat.label}><dt>{stat.label}</dt><dd>{stat.value}</dd></div>)}</dl></details></div></div></motion.article>)}</div><motion.a {...reveal} className="github-strip" href={profile.github} target="_blank" rel="noreferrer"><Github size={25}/><span>More of my work is on GitHub.<small>Including smaller projects and things I’m still working on.</small></span><ArrowUpRight size={30}/></motion.a></section>
+ <section className="about" id="about"><div className="shell"><div className="section-meta"><span>02 / ABOUT ME</span><span>STILL A LOT TO LEARN</span></div><div className="about-grid"><motion.div {...reveal}><h2>A bit about<br /><em>how I work.</em></h2><div className="about-graphic" aria-hidden="true"><div className="about-star">✳</div><div className="about-sticker">CURRENTLY<br /><strong>learning.</strong><span>ROBOTICS & AI</span></div></div></motion.div><motion.div {...reveal} className="about-copy"><p className="big-copy">I tend to understand things better when I try building them myself.</p><p>I’m studying Robotics & Artificial Intelligence. My projects have taken me from C++ game engines to Python simulations and Android development.</p><p>I’m into coding, embedded systems, and robotics. I like writing software and figuring out how to bring it together with electronics and hardware to build things that work in the real world.</p><div className="about-facts"><div><span>WHAT I USE</span><p>C++ · Python · C · Kotlin<br />JavaScript · NumPy · Git</p></div><div><span>WHAT I’M LEARNING ABOUT</span><p>Autonomous navigation<br />Computer vision · Physics simulation</p></div></div></motion.div></div></div></section>
+ <section className="contact shell" id="contact"><div className="section-meta"><span>03 / GET IN TOUCH</span><span><i /> OPEN TO PROJECTS & COLLABORATION</span></div><motion.div {...reveal}><h2>Have an idea?<br /><em>Let’s talk.</em> <a href={`mailto:${profile.email}`} aria-label="Email Atharv"><ArrowUpRight /></a></h2><div className="contact-bottom"><p>Want to work on a project together?<br />Or have a question about something here?<br /><strong>Drop me a message.</strong></p><div><a href={`mailto:${profile.email}`} className="email">{profile.email}</a><button onClick={copyEmail} className="copy" aria-live="polite">{copied ? "COPIED ✓" : "COPY EMAIL ↗"}</button></div></div></motion.div></section>
+ </main><footer className="shell"><a href="#" className="footer-logo">ab✳</a><span>© {new Date().getFullYear()} ATHARV BABU<br />THANKS FOR HAVING A LOOK.</span><div><a href={profile.github} target="_blank" rel="noreferrer">GitHub ↗</a><a href={profile.linkedin} target="_blank" rel="noreferrer">LinkedIn ↗</a><a href="#">Back to top ↑</a></div></footer>
+ </MotionConfig>;
 }

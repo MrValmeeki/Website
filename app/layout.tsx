@@ -15,9 +15,10 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Atharv Babu — Robotics & AI Engineer",
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || "https://atharvbabu.netlify.app"),
+  title: "Atharv Babu — Projects & Experiments",
   description:
-    "Portfolio of Atharv Babu, a Robotics & AI Engineering student building intelligent systems, C++ game engines, gravitational simulations, and autonomous software.",
+    "I’m Atharv, a Robotics & AI student. Here are a few things I’ve built, from a C++ game engine to a gravity simulator and an Android travel alarm.",
   keywords: [
     "Atharv Babu",
     "Robotics Engineer",
@@ -34,16 +35,16 @@ export const metadata: Metadata = {
     type: "website",
     locale: "en_US",
     url: "https://atharvbabu.netlify.app",
-    title: "Atharv Babu — Robotics & AI Engineer",
+    title: "Atharv Babu — Projects & Experiments",
     description:
-      "Robotics & AI Engineering student building intelligent systems, C++ game engines, and physical simulations.",
+      "A few projects by Atharv Babu: games, physics simulations, and apps.",
     siteName: "Atharv Babu Portfolio",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Atharv Babu — Robotics & AI Engineer",
+    title: "Atharv Babu — Projects & Experiments",
     description:
-      "Robotics & AI Engineering student building intelligent systems, C++ game engines, and physical simulations.",
+      "A few projects by Atharv Babu: games, physics simulations, and apps.",
   },
   robots: {
     index: true,
@@ -52,8 +53,8 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#08090e",
-  colorScheme: "dark",
+  themeColor: "#eeeee6",
+  colorScheme: "light",
   width: "device-width",
   initialScale: 1,
 };
@@ -64,8 +65,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${spaceGrotesk.variable} ${jetbrainsMono.variable} dark`}>
+    <html lang="en" className={`${spaceGrotesk.variable} ${jetbrainsMono.variable}`}>
       <body className="font-sans antialiased">{children}</body>
     </html>
   );
 }
+
+
+
