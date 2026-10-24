@@ -2,6 +2,7 @@
 
 The Play design: an animated portfolio using slate (#95a5a6), burnt orange (#df542f), and a paper background.
 
+<<<<<<< HEAD
 ## Run locally
 
     npm install
@@ -25,3 +26,8 @@ Set NEXT_PUBLIC_SITE_URL to the full production URL when deploying to a differen
 - Artwork is illustrative HTML/CSS/SVG. The favicon and social-preview image are generated from app/.
 
 Only application source and configuration were copied from Portfolio-Play. Dependencies, build output, caches, Git metadata, and the destination .gitignore were not copied or replaced.
+=======
+- **Live Website**: [atharvbabu.netlify.app](https://atrv.is-a.dev)
+- **GitHub**: [@MrValmeeki](https://github.com/MrValmeeki)
+- **LinkedIn**: [atharv-babu](https://www.linkedin.com/in/atharv-babu/)
+>>>>>>> eccfc4c6cf57e8b6c306121f1ace3cb1e0ac171a
