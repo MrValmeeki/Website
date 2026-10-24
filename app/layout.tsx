@@ -16,7 +16,7 @@ const jetbrainsMono = JetBrains_Mono({
 
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || "https://atharvbabu.netlify.app"),
-  title: "Atharv Babu — Projects & Experiments",
+  title: "Atrv",
   description:
     "I’m Atharv, a Robotics & AI student. Here are a few things I’ve built, from a C++ game engine to a gravity simulator and an Android travel alarm.",
   keywords: [
@@ -35,14 +35,14 @@ export const metadata: Metadata = {
     type: "website",
     locale: "en_US",
     url: "https://atharvbabu.netlify.app",
-    title: "Atharv Babu — Projects & Experiments",
+    title: "Atrv",
     description:
       "A few projects by Atharv Babu: games, physics simulations, and apps.",
-    siteName: "Atharv Babu Portfolio",
+    siteName: "Atrv",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Atharv Babu — Projects & Experiments",
+    title: "Atrv",
     description:
       "A few projects by Atharv Babu: games, physics simulations, and apps.",
   },
